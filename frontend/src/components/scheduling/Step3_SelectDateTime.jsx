@@ -54,7 +54,6 @@ export default function Step3_SelectDateTime({
                   <button
                     key={time}
                     onClick={() => onSelectTime(time)}
-                    // Usamos las nuevas clases para los botones de hora
                     className={`time-slot-button p-2 rounded-lg text-sm font-semibold transition-colors bg-slate-700 text-gray-300 ${
                       selectedTime === time ? "selected" : ""
                     }`}
