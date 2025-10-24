@@ -1,0 +1,194 @@
+/* path: frontend/src/index.css */
+
+/* 1. Importa la fuente 'Poppins' desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&display=swap");
+
+/* 2. Importa las capas base de Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  body {
+    /* Nos aseguramos que el body herede el fondo del div principal */
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+html.dark .dark-gradient-bg {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+/* 3. Define tus variables de color y tipografía personalizadas */
+@layer base {
+  :root {
+    /* Tu paleta de colores personalizada en formato HSL */
+    --background: 210 100% 98%; /* #cae9ff - Un azul muy claro como fondo */
+    --foreground: 208 55% 25%; /* #1b4965 - El azul oscuro como texto principal */
+
+    --card: 0 0% 100%; /* Blanco para las tarjetas */
+    --card-foreground: 208 55% 25%; /* Texto oscuro para las tarjetas */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 208 55% 25%;
+
+    --primary: 196 52% 59%; /* #62b6cb - Tu azul medio como color principal */
+    --primary-foreground: 208 55% 25%; /* Texto oscuro sobre el color primario */
+
+    --secondary: 175 53% 83%; /* #bee9e8 - Tu verde-azulado claro como secundario */
+    --secondary-foreground: 208 55% 25%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 202 52% 66%; /* #5fa8d3 - Tu azul cielo como acento */
+    --accent-foreground: 208 55% 25%;
+
+    --destructive: 0 84.2% 60.2%; /* Rojo estándar para acciones destructivas */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 40% 90%;
+    --input: 210 40% 90%;
+    --ring: 196 52% 59%; /* El color primario para el anillo de foco */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Aquí irían los colores para un futuro modo oscuro */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* 4. Establece 'Poppins' como tu fuente por defecto */
+    font-family: "Poppins", sans-serif;
+  }
+
+  .rdp-caption_dropdowns {
+    display: flex;
+    gap: 0.75rem; /* 12px */
+    align-items: center;
+  }
+
+  .rdp-vhidden {
+    display: none !important;
+  }
+
+  .rdp-caption_label {
+    display: none;
+  }
+  .rdp-caption_dropdowns select {
+    display: inline-block !important;
+    background: white;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.9rem;
+  }
+
+  body.light-theme {
+    background: linear-gradient(to top right, #f3e8ff, #e0e7ff);
+  }
+  html.dark body.dark-theme {
+    background-color: #0b1120;
+  }
+
+  /* Efecto Glassmorphism */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  html.dark .glass-panel {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Animaciones y Estilos de Formulario Mejorados */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .form-element {
+    animation: fadeIn 0.6s ease-in-out forwards;
+    opacity: 0;
+  }
+  .input-field:focus-within {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+  }
+  html.dark .input-field:focus-within {
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.4);
+  }
+
+  /* Animación para Imagen */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  .floating-image {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* === ESTILOS PERSONALIZADOS PARA EL CALENDARIO DEL ASISTENTE === */
+
+  /* Cambia el color de fondo de los botones de hora en el Paso 3 */
+  .time-slot-button:hover {
+    background-color: #0e7490; /* Un tono de cian más oscuro */
+  }
+  .time-slot-button.selected {
+    background-color: #06b6d4; /* Cian principal */
+    color: white;
+  }
+
+  /* Estilos para el componente Calendar de Shadcn/ui (react-day-picker) */
+  .rdp {
+    --rdp-cell-size: 40px;
+    --rdp-accent-color: #06b6d4; /* Color de acento (cian) */
+    --rdp-background-color: #06b6d4; /* Color de fondo del día seleccionado */
+  }
+
+  /* Estilos específicos para nuestro tema oscuro */
+  .bg-slate-800 .rdp {
+    --rdp-caption-color: #f1f5f9; /* slate-100 */
+    --rdp-nav-color: #94a3b8; /* slate-400 */
+    --rdp-heading-color: #64748b; /* slate-500 */
+    --rdp-cell-color: #cbd5e1; /* slate-300 */
+    --rdp-selected-color: #ffffff; /* blanco */
+    --rdp-hover-color: #1e293b; /* slate-800 */
+  }
+
+  .bg-slate-800 .rdp-day_outside {
+    color: #475569; /* slate-600 */
+  }
+
+  .bg-slate-800 .rdp-day_disabled {
+    color: #475569; /* slate-600 */
+  }
+
+  .bg-slate-800 .rdp-button:hover:not([disabled]) {
+    background-color: #334155; /* slate-700 */
+  }
+}
