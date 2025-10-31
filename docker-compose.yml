@@ -1,0 +1,31 @@
+version: '3.8' # Versión de Docker Compose
+
+services:
+  # --- Nuestro Servicio de Base de Datos ---
+  db:
+    image: mysql:8.0 # Usamos la imagen oficial de MySQL (versión 8.0)
+    container_name: psyche_scheduler_db
+    restart: always # Siempre se reinicia si se cae
+
+    # --- Configuración de la Base de Datos ---
+    # Estas variables de entorno deben coincidir con tu
+    # archivo 'application.properties' de Spring Boot.
+    environment:
+      MYSQL_DATABASE: psyche_scheduler_db
+      MYSQL_ROOT_PASSWORD: tu_contraseña_de_mysql # <-- ¡Cambia esto por tu contraseña real!
+
+    # --- Puertos ---
+    # Mapea el puerto 3306 de tu máquina (localhost)
+    # al puerto 3306 dentro del contenedor.
+    ports:
+      - "3307:3306"
+
+    # --- Persistencia de Datos (¡MUY IMPORTANTE!) ---
+    # Esto guarda los datos de tu BD en un "volumen"
+    # para que no se borren si el contenedor se apaga.
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+# Declara el volumen que usaremos
+volumes:
+  mysql-data: {}

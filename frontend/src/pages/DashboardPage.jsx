@@ -1,10 +1,11 @@
 // path: frontend/src/pages/DashboardPage.jsx
 
+// path: frontend/src/pages/DashboardPage.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
-import { Loader2, Users, Calendar, BarChart2 } from "lucide-react";
+import { Loader2, Users, Calendar } from "lucide-react";
 
 // Pequeño componente para las tarjetas de estadísticas
 const StatCard = ({ title, value, icon }) => (
@@ -25,19 +26,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!token) {
-      // Si no hay token, no es un error, simplemente no cargamos datos de dashboard
       setLoading(false);
       return;
     }
 
     const fetchSummary = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5201/api/dashboard/summary",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get("http://localhost:8080/api/dashboard", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setSummaryData(response.data);
       } catch (err) {
         setError("No se pudo cargar el resumen del dashboard.");
@@ -64,9 +61,7 @@ export default function DashboardPage() {
   if (!token) {
     return (
       <div className="container mx-auto p-4 text-center">
-        <h1 className="text-4xl font-bold my-8">
-          Bienvenido a Psyche-Scheduler
-        </h1>
+        <h1 className="text-4xl font-bold my-8">Bienvenido a Psyche-Scheduler</h1>
         <p className="text-lg text-gray-600">
           Inicia sesión o regístrate para gestionar tus sesiones.
         </p>
@@ -82,60 +77,61 @@ export default function DashboardPage() {
     );
   }
 
+  // Si no hay datos aún, evita acceder a propiedades nulas
+  if (!summaryData) {
+    return (
+      <div className="container mx-auto p-4">
+        <p className="text-gray-600">Cargando datos del dashboard...</p>
+      </div>
+    );
+  }
+
   // Si hay token, mostramos el dashboard del psicólogo
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        Dashboard ({summaryData.userRole === "PATIENT" ? "Paciente" : "Profesional"})
+      </h1>
 
       {/* Sección de Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <StatCard
-          title="Pacientes Totales"
-          value={summaryData?.stats?.totalPatients}
-          icon={<Users className="h-6 w-6 text-blue-600" />}
-        />
-        <StatCard
-          title="Sesiones este Mes"
-          value={summaryData?.stats?.bookingsThisMonth}
+          title={
+            summaryData.userRole === "PATIENT"
+              ? "Total Citas Programadas"
+              : "Total Citas Pendientes"
+          }
+          value={summaryData.totalUpcomingBookings}
           icon={<Calendar className="h-6 w-6 text-blue-600" />}
         />
+        {summaryData.userRole === "PROFESSIONAL" && (
+          <StatCard
+            title="Clientes para Hoy"
+            value={summaryData.totalClientsToday}
+            icon={<Users className="h-6 w-6 text-blue-600" />}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Sección de Próximas Sesiones */}
+        {/* Próxima Sesión */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Próximas Sesiones</h2>
+          <h2 className="text-2xl font-semibold mb-4">Próxima Sesión</h2>
           <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            {summaryData?.upcomingBookings?.length > 0 ? (
-              summaryData.upcomingBookings.map((booking) => (
-                <div key={booking.id} className="border-b pb-2">
-                  <p className="font-semibold">{booking.patientName}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(booking.bookingDate).toLocaleString()}
-                  </p>
-                </div>
-              ))
+            {summaryData.upcomingBooking ? (
+              <div className="border-b pb-2">
+                <p className="font-semibold">
+                  {summaryData.upcomingBooking.participantName}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {new Date(summaryData.upcomingBooking.startTime).toLocaleString(
+                    "es-MX",
+                    { dateStyle: "long", timeStyle: "short" }
+                  )}
+                </p>
+              </div>
             ) : (
               <p>No tienes próximas sesiones agendadas.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Sección de Pacientes Recientes */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Pacientes Recientes</h2>
-          <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            {summaryData?.recentPatients?.length > 0 ? (
-              summaryData.recentPatients.map((patient) => (
-                <div key={patient.id} className="border-b pb-2">
-                  <p className="font-semibold">
-                    {patient.firstName} {patient.lastName}
-                  </p>
-                  <p className="text-sm text-gray-500">{patient.email}</p>
-                </div>
-              ))
-            ) : (
-              <p>No hay pacientes recientes.</p>
             )}
           </div>
         </div>

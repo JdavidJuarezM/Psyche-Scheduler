@@ -156,7 +156,7 @@ export default function ProfilePage() {
     if (!loading) setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5201/api/users/profile",
+        "http://localhost:8080/api/patients/my-profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         }

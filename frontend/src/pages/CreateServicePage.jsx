@@ -16,6 +16,7 @@ export default function CreateServicePage() {
     name: "",
     description: "",
     price: 0,
+    durationMinutes: 30, // Duración por defecto
   });
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useAuth();
@@ -29,7 +30,7 @@ export default function CreateServicePage() {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === "price" ? parseFloat(value) : value,
+      [name]: name === "price" || name === "durationInMinutes" ? parseFloat(value) : value,
     });
   };
 
@@ -39,7 +40,7 @@ export default function CreateServicePage() {
 
     await toast.promise(
       axios
-        .post("http://localhost:5201/api/services", formData, {
+        .post("http://localhost:8080/api/services", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -101,6 +102,22 @@ export default function CreateServicePage() {
               required
             />
           </div>
+
+            <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="durationInMinutes">Duración (en minutos)</Label>
+            <Input
+              type="number"
+              id="durationInMinutes"
+              name="durationInMinutes"
+              placeholder="Ej: 50"
+              value={formData.durationInMinutes}
+              onChange={handleChange}
+              required
+              min="15" // Añadir validación
+            />
+          </div>
+
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? "Guardando..." : "Crear Servicio"}

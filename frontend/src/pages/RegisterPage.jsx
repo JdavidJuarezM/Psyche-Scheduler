@@ -15,6 +15,7 @@ export default function RegisterPage() {
     lastName: "",
     email: "",
     password: "",
+    role: "PATIENT",
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,12 +27,19 @@ export default function RegisterPage() {
     });
   };
 
+  const handleRoleChange = (value) => {
+    setFormData({
+      ...formData,
+      role: value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     await toast.promise(
       axios
-        .post("http://localhost:5201/api/patients/register", formData)
+        .post("http://localhost:8080/api/auth/register", formData)
         .finally(() => setIsLoading(false)),
       {
         loading: "Registrando usuario...",

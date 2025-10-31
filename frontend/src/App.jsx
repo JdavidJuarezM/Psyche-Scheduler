@@ -19,7 +19,7 @@ function App() {
       <Route element={<MainLayout />}>
         {/* Rutas Públicas */}
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/service/:id" element={<ServiceDetailPage />} />
+
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
 
@@ -33,15 +33,6 @@ function App() {
           }
         />
         {/* --- Ruta para el nuevo asistente de agendamiento --- */}
-        <Route
-          path="/schedule"
-          element={
-            <ProtectedRoute>
-              <ScheduleAppointmentPage />
-            </ProtectedRoute>
-          }
-        />
-
         {/* vvv 2. ESTRUCTURA DE RUTAS ANIDADAS PARA EL PACIENTE vvv */}
         <Route
           element={

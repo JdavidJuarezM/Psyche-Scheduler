@@ -23,7 +23,7 @@ export default function ServiceDetailPage() {
     const fetchService = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5201/api/services/${id}`
+          `http://localhost:8080/api/services/${id}`
         );
         setService(response.data);
       } catch (err) {
@@ -52,7 +52,7 @@ export default function ServiceDetailPage() {
     await toast.promise(
       axios
         .post(
-          "http://localhost:5201/api/bookings",
+          "http://localhost:8080/api/bookings",
           { serviceId: id, bookingDate: bookingDate },
           { headers: { Authorization: `Bearer ${token}` } }
         )

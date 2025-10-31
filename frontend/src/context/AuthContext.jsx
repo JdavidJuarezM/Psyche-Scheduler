@@ -4,46 +4,57 @@ import { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { jwtDecode } from "jwt-decode"; // <-- 1. Importa jwt-decode
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  // 2. Nuevo estado para guardar la información del usuario (incluyendo el rol)
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
       localStorage.setItem("token", token);
-      const decodedToken = jwtDecode(token); // Decodifica el token
-      // El rol está en una URL larga, la extraemos
-      const role =
-        decodedToken[
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ];
-      setUser({ ...decodedToken, role }); // Guarda la información del usuario y el rol
+      const decodedToken = jwtDecode(token);
+
+      // --- VERIFICACIÓN ---
+      // Imprime el token decodificado para ver las claves reales
+      console.log("Decoded Token:", decodedToken);
+
+      // Es probable que la clave del rol sea 'roles' o 'authorities'
+      // Ajusta la siguiente línea según lo que veas en la consola.
+      const role = decodedToken.roles ? decodedToken.roles[0] : null;
+
+      setUser({ ...decodedToken, role });
     } else {
       localStorage.removeItem("token");
-      setUser(null); // Limpia el usuario si no hay token
+      setUser(null);
     }
   }, [token]);
 
-  const login = async (formData) => {
+const login = async (formData) => {
     await toast.promise(
-      axios.post("http://localhost:5201/api/users/login", formData),
+       axios.post("http://localhost:8080/api/auth/login", formData),
       {
         loading: "Iniciando sesión...",
         success: (response) => {
           setToken(response.data.token);
-          // La redirección ahora puede depender del rol, pero por ahora lo dejamos simple
-          navigate("/profile");
+          const decodedToken = jwtDecode(response.data.token);
+          const role = decodedToken.roles ? decodedToken.roles[0] : null;
+          if (role === "ROLE_PROFESSIONAL") {
+            navigate("/services/create");
+          } else {
+            navigate("/profile");
+          }
           return "¡Bienvenido de nuevo!";
         },
         error: (err) => {
           console.error("Error during login:", err);
-          return "Error en el login. Revisa tus credenciales.";
+          if (err.response && err.response.data && err.response.data.message) {
+            return err.response.data.message;
+          }
+          return "Error en el login. Revisa tus credenciales o inténtalo más tarde.";
         },
       }
     );
@@ -54,7 +65,6 @@ export function AuthProvider({ children }) {
     navigate("/login");
   };
 
-  // 3. Expone el 'user' en el valor del contexto
   const value = { token, user, login, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

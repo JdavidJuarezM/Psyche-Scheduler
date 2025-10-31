@@ -20,7 +20,7 @@ export default function MyBookingsPage() {
     const fetchBookings = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5201/api/bookings/my-bookings",
+          "http://localhost:8080/api/bookings/my-bookings",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -49,12 +49,21 @@ export default function MyBookingsPage() {
       <div className="space-y-4">
         {bookings.length > 0 ? (
           bookings.map((booking) => (
-            <div key={booking.id} className="bg-white p-4 rounded-lg shadow-md">
+            <div key={booking.bookingId} className="bg-white p-4 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold">
-                {booking.restaurantName}
+                {booking.serviceName}
               </h2>
+              <p className="text-gray-700">
+                Con: {booking.professionalName}
+              </p>
               <p className="text-gray-600">
-                Fecha: {new Date(booking.bookingDate).toLocaleString()}
+                Fecha: {new Date(booking.startTime).toLocaleString('es-MX', {
+                    dateStyle: 'long',
+                    timeStyle: 'short'
+                })}
+              </p>
+              <p className="text-sm font-medium text-blue-600">
+                Estado: {booking.status}
               </p>
             </div>
           ))

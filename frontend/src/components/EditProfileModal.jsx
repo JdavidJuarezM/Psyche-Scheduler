@@ -75,7 +75,7 @@ export default function EditProfileModal({
     setIsLoading(true);
     await toast.promise(
       axios
-        .put("http://localhost:5201/api/users/profile", formData, {
+        .put("http://localhost:8080/api/patients/my-profile", formData, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .finally(() => setIsLoading(false)),

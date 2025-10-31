@@ -31,8 +31,8 @@ export function useAppointmentScheduler() {
       setLoading({ initial: true, times: false });
       try {
         const [typesResponse, profsResponse] = await Promise.all([
-          axios.get("http://localhost:5201/api/services"),
-          axios.get("http://localhost:5201/api/professionals"),
+          axios.get("http://localhost:8080/api/services"),
+          axios.get("http://localhost:8080/api/professionals"),
         ]);
         setAppointmentTypes(typesResponse.data);
         setProfessionals(profsResponse.data);
@@ -47,26 +47,29 @@ export function useAppointmentScheduler() {
   }, []);
 
   // Carga de disponibilidad
-  useEffect(() => {
-    if (selectedInfo.prof && selectedInfo.date) {
-      const fetchAvailability = async () => {
-        setLoading((prev) => ({ ...prev, times: true }));
-        setSelectedInfo((prev) => ({ ...prev, time: null })); // Resetea la hora
-        try {
-          const dateString = selectedInfo.date.toISOString().split("T")[0];
-          const response = await axios.get(
-            `http://localhost:5201/api/availability/${selectedInfo.prof.id}?date=${dateString}`
-          );
-          setAvailableTimes(response.data);
-        } catch (err) {
-          toast.error("No se pudo cargar la disponibilidad para esta fecha.");
-        } finally {
-          setLoading((prev) => ({ ...prev, times: false }));
-        }
-      };
-      fetchAvailability();
-    }
-  }, [selectedInfo.prof, selectedInfo.date]);
+  // CÓDIGO CORREGIDO:
+useEffect(() => {
+  // Agregamos 'selectedInfo.type' a la condición
+  if (selectedInfo.prof && selectedInfo.date && selectedInfo.type) {
+    const fetchAvailability = async () => {
+      setLoading((prev) => ({ ...prev, times: true }));
+      setSelectedInfo((prev) => ({ ...prev, time: null }));
+      try {
+        const dateString = selectedInfo.date.toISOString().split("T")[0];
+        // Agregamos serviceId a la URL
+        const response = await axios.get(
+          `http://localhost:8080/api/availability/professional/${selectedInfo.prof.id}?serviceId=${selectedInfo.type.id}&date=${dateString}`
+        );
+        setAvailableTimes(response.data);
+      } catch (err) {
+        toast.error("No se pudo cargar la disponibilidad para esta fecha.");
+      } finally {
+        setLoading((prev) => ({ ...prev, times: false }));
+      }
+    };
+    fetchAvailability();
+  }
+}, [selectedInfo.prof, selectedInfo.date, selectedInfo.type]); // <-- Agregamos 'selectedInfo.type' a las dependencias
 
   // Manejadores de estado
   const handlers = {
@@ -103,11 +106,11 @@ export function useAppointmentScheduler() {
 
       await toast.promise(
         axios.post(
-          "http://localhost:5201/api/bookings",
+          "http://localhost:8080/api/bookings",
           {
             serviceId: selectedInfo.type.id,
             professionalId: selectedInfo.prof.id,
-            bookingDate: bookingDateTime.toISOString(),
+            startTime: bookingDateTime.toISOString()
           },
           { headers: { Authorization: `Bearer ${token}` } }
         ),
